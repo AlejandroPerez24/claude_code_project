@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>franky's — caps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-arcade-cream: #f3e5df;
+    --color-ink-black: #000000;
+    --color-pixel-gray: #e5e7eb;
+    --color-charcoal: #333333;
+    --color-carbon: #151515;
+    --color-muted-gray: #737373;
+    --color-marquee-orange: #faa21f;
+    --color-buy-green: #128e44;
+
+    --font-arcade: 'Press Start 2P', 'VT323', ui-monospace, 'Courier New', monospace;
+
+    --text-caption: 10px;
+    --text-body-sm: 14px;
+    --text-body: 16px;
+    --text-subheading: 18px;
+
+    --radius-md: 6px;
+    --radius-xl: 12px;
+    --radius-full: 9999px;
+
+    --shadow-subtle: rgb(243, 229, 223) 0px 1px 0px 0px inset;
+    --page-max-width: 1200px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    height: 100%;
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+    background: var(--color-arcade-cream);
+  }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--color-arcade-cream);
+    color: var(--color-ink-black);
+    font-family: var(--font-arcade);
+    font-size: var(--text-body-sm);
+    line-height: 1.43;
+    letter-spacing: normal;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+  }
+  button { font: inherit; color: inherit; letter-spacing: normal; cursor: pointer; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+
+  /* ---------- Marquee announcement bar ---------- */
+  .marquee {
+    height: 36px;
+    padding-top: env(safe-area-inset-top, 0px);
+    box-sizing: content-box;
+    background: linear-gradient(to right, #faa21f, #fef3c7, #faa21f);
+    border-bottom: 1px solid #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex;
+    flex-shrink: 0;
+    min-width: 100%;
+    animation: ticker 28s steps(240) infinite;
+  }
+  .marquee span { padding-right: 48px; font-size: var(--text-body-sm); color: #000; }
+  @keyframes ticker { to { transform: translateX(-50%); } }
+
+  /* ---------- Header ---------- */
+  .header {
+    background: var(--color-arcade-cream);
+    border-bottom: 1px solid #000;
+    height: 44px;
+  }
+  .header-inner {
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .wordmark {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: var(--text-subheading); font-weight: 700;
+  }
+  .wordmark svg { width: 16px; height: 16px; shape-rendering: crispEdges; }
+  .header-actions { display: flex; align-items: center; gap: 24px; }
+  .cart-link {
+    background: none; border: 0; padding: 4px 0; font-weight: 700; font-size: var(--text-body-sm);
+  }
+  .hamburger {
+    background: none; border: 0; padding: 8px 0; width: 24px;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  }
+  .hamburger i { display: block; height: 2px; background: #000; width: 16px; }
+
+  /* dropdown panels (menu + cart) */
+  .panel {
+    position: absolute; right: 12px; top: 100%;
+    margin-top: 4px; width: min(320px, calc(100vw - 24px));
+    background: var(--color-arcade-cream);
+    border: 2px solid #000; border-radius: var(--radius-xl);
+    padding: 12px; z-index: 30;
+  }
+  .panel[hidden] { display: none; }
+  .header-inner { position: relative; }
+  .panel h2 { margin: 0 0 12px; font-size: var(--text-body-sm); font-weight: 700; }
+  .panel ul { list-style: none; margin: 0; padding: 0; }
+  .panel li { padding: 8px 0; border-top: 1px solid var(--color-pixel-gray); display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: var(--text-caption); line-height: 1.5; }
+  .panel li:first-child { border-top: 0; }
+  .panel .empty { font-size: var(--text-caption); line-height: 1.5; color: var(--color-muted-gray); margin: 0; }
+  .panel .total { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid #000; font-weight: 700; }
+  .panel nav a { display: block; padding: 8px 0; font-weight: 700; border-top: 1px solid var(--color-pixel-gray); }
+  .panel nav a:first-child { border-top: 0; }
+  .remove { background: none; border: 1px solid #000; border-radius: var(--radius-md); padding: 2px 8px; font-size: var(--text-caption); }
+
+  /* ---------- Main layout ---------- */
+  main {
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    min-height: calc(100vh - 36px - 44px - 32px);
+  }
+
+  /* ---------- Hero 3D/AR panel ---------- */
+  .hero {
+    position: sticky; top: 0;
+    align-self: start;
+    height: calc(100vh - 36px - 44px - 32px);
+    min-height: 480px;
+    overflow: hidden;
+    border-right: 1px solid #000;
+    background: var(--color-arcade-cream);
+    isolation: isolate;
+  }
+  .floor-wrap {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 62%;
+    perspective: 420px; perspective-origin: 50% 0%;
+    overflow: hidden;
+    border-top: 2px solid #000;
+  }
+  .floor {
+    position: absolute; left: -60%; right: -60%; top: 0; height: 160%;
+    transform-origin: 50% 0%;
+    transform: rotateX(62deg);
+    background:
+      conic-gradient(#000 25%, #f3e5df 0 50%, #000 0 75%, #f3e5df 0) 0 0 / 96px 96px;
+  }
+  .stage {
+    position: absolute; left: 50%; top: 38%;
+    width: min(62%, 380px);
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .cap-wrap { animation: bob 2.4s steps(2) infinite; }
+  .cap-wrap svg { width: 100%; height: auto; display: block; shape-rendering: crispEdges; }
+  .cap-spin { transform-origin: 50% 50%; }
+  .spinning .cap-spin { animation: turn 3.2s steps(16) infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes turn {
+    0% { transform: scaleX(1); } 50% { transform: scaleX(-1); } 100% { transform: scaleX(1); }
+  }
+  .cap-shadow {
+    position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%);
+    width: 70%; height: 16px; background: var(--color-charcoal);
+    clip-path: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
+  }
+  .hero-label {
+    position: absolute; left: 12px; top: 12px; z-index: 3;
+    background: var(--color-arcade-cream); border: 1px solid #000; border-radius: var(--radius-md);
+    padding: 4px 8px; font-size: var(--text-caption); line-height: 1.5;
+  }
+  .toggles {
+    position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
+    z-index: 4; display: flex; gap: 8px;
+  }
+  .toggle {
+    background: var(--color-arcade-cream);
+    border: 1px solid #000; border-radius: var(--radius-md);
+    box-shadow: var(--shadow-subtle);
+    padding: 2px 8px; font-size: var(--text-body-sm);
+    line-height: 1.43; min-height: 28px;
+  }
+  .toggle[aria-pressed="true"] { background: #000; color: var(--color-arcade-cream); box-shadow: none; }
+  .ar-note {
+    position: absolute; left: 12px; right: 12px; bottom: 72px; z-index: 5;
+    background: var(--color-arcade-cream); border: 2px solid #000; border-radius: var(--radius-xl);
+    padding: 12px; font-size: var(--text-caption); line-height: 1.8; text-align: center;
+  }
+  .ar-note[hidden] { display: none; }
+
+  /* ---------- Product grid ---------- */
+  .shop { padding: 12px; }
+  .shop-head { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0 12px; }
+  .shop-head h1 { margin: 0; font-size: var(--text-subheading); line-height: 1.56; font-weight: 700; }
+  .shop-head p { margin: 0; font-size: var(--text-caption); line-height: 1.5; color: var(--color-muted-gray); }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  .card {
+    background: var(--color-arcade-cream);
+    border: 1px solid var(--color-pixel-gray);
+    border-radius: var(--radius-xl);
+    padding: 12px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .card.selected { border-color: #000; border-width: 2px; padding: 11px; }
+  .card-img {
+    all: unset; display: block; cursor: pointer;
+    aspect-ratio: 1 / 0.9; width: 100%;
+    border-radius: 6px;
+  }
+  .card-img:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+  .card-img svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+  .meta { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+  .meta .title { font-size: var(--text-body-sm); font-weight: 700; line-height: 1.43; margin: 0; }
+  .meta .price { font-size: var(--text-body-sm); font-weight: 400; white-space: nowrap; }
+  .actions { display: flex; flex-direction: column; gap: 4px; }
+
+  .btn {
+    border-radius: var(--radius-md);
+    font-size: var(--text-body-sm); line-height: 1.43;
+    text-transform: uppercase; width: 100%;
+    box-shadow: var(--shadow-subtle);
+  }
+  .btn-ghost { background: transparent; border: 1px solid #000; color: #000; padding: 4px 12px; font-weight: 400; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .pill {
+    border: 1px solid #000; border-radius: var(--radius-full);
+    font-size: var(--text-caption); line-height: 1.5; padding: 2px 8px;
+  }
+  .btn-buy { background: var(--color-buy-green); border: 1px solid var(--color-buy-green); color: #fff; padding: 8px 12px; font-weight: 700; }
+  .btn-buy[data-added="true"] { background: var(--color-arcade-cream); color: #000; border-color: #000; box-shadow: none; }
+  .btn-out { background: transparent; border: 1px solid var(--color-muted-gray); color: var(--color-muted-gray); padding: 8px 12px; font-weight: 400; cursor: not-allowed; box-shadow: none; }
+
+  /* ---------- Footer ---------- */
+  .footer { border-top: 1px solid var(--color-pixel-gray); background: var(--color-arcade-cream); }
+  .footer-inner {
+    max-width: var(--page-max-width); margin: 0 auto; min-height: 32px; padding: 8px 12px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    font-size: var(--text-body-sm);
+  }
+  .footer-links { display: flex; gap: 24px; font-weight: 700; }
+  .footer-links button { background: none; border: 0; padding: 0; font-weight: 700; font-size: var(--text-body-sm); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; min-height: 0; }
+    .hero { position: relative; height: 380px; min-height: 0; border-right: 0; border-bottom: 1px solid #000; }
+    .stage { top: 30%; width: min(58%, 260px); }
+    .grid { grid-template-columns: 1fr; }
+    .footer-inner { font-size: var(--text-caption); }
+    .footer-links button { font-size: var(--text-caption); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track, .cap-wrap, .spinning .cap-spin { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee" aria-label="Announcement">
+  <div class="marquee-track" id="marquee"></div>
+</div>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="wordmark" href="#top" aria-label="franky's home">
+      <svg viewBox="0 0 5 5" aria-hidden="true"><rect x="2" y="0" width="1" height="5" fill="#000"/><rect x="0" y="2" width="5" height="1" fill="#000"/></svg>
+      franky's
+    </a>
+    <div class="header-actions">
+      <button class="cart-link" id="cartBtn" aria-expanded="false" aria-controls="cartPanel">CART (<span id="cartCount">0</span>)</button>
+      <button class="hamburger" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menuPanel"><i></i><i></i><i></i></button>
+    </div>
+
+    <section class="panel" id="cartPanel" hidden aria-label="Cart">
+      <h2>YOUR CART</h2>
+      <p class="empty" id="cartEmpty">Nothing here yet. Add a cap from the grid.</p>
+      <ul id="cartList"></ul>
+      <div class="total" id="cartTotal" hidden><span>TOTAL</span><span id="cartSum">€0</span></div>
+    </section>
+
+    <section class="panel" id="menuPanel" hidden aria-label="Menu">
+      <h2>MENU</h2>
+      <nav>
+        <a href="#shop">CAPS</a>
+        <a href="#top">3D VIEWER</a>
+        <a href="#shipping">SHIPPING</a>
+        <a href="#subscribe">SUBSCRIBE</a>
+      </nav>
+    </section>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero" aria-label="Product viewer">
+    <div class="hero-label" id="heroLabel">FRANKY'S GREEN 665</div>
+    <div class="floor-wrap" aria-hidden="true"><div class="floor"></div></div>
+    <div class="stage" id="stage">
+      <div class="cap-wrap"><div class="cap-spin" id="heroCap"></div></div>
+      <div class="cap-shadow" aria-hidden="true"></div>
+    </div>
+    <div class="ar-note" id="arNote" hidden role="status">AR OPENS ON YOUR PHONE. SCAN THE QR AT CHECKOUT OR OPEN THIS PAGE ON MOBILE TO PLACE THE CAP ON YOUR HEAD.</div>
+    <div class="toggles" role="group" aria-label="Viewer mode">
+      <button class="toggle" id="t3d" aria-pressed="false">3D</button>
+      <button class="toggle" id="tar" aria-pressed="false">AR</button>
+    </div>
+  </section>
+
+  <section class="shop" id="shop" aria-label="Products">
+    <div class="shop-head">
+      <h1>CAPS</h1>
+      <p id="count">6 ITEMS</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span>© FRANKY'S AMSTERDAM 2023</span>
+    <div class="footer-links">
+      <button id="subscribe" type="button">SUBSCRIBE</button>
+      <button id="shipping" type="button">SHIPPING</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const PRODUCTS = [
+    { id: 'green-665',  name: "FRANKY'S GREEN 665",  price: 65, stock: true,  main: '#1f6b3a', shade: '#154a28', brim: '#151515', patch: '#f3e5df' },
+    { id: 'black-420',  name: "FRANKY'S BLACK 420",  price: 60, stock: true,  main: '#151515', shade: '#000000', brim: '#333333', patch: '#faa21f' },
+    { id: 'cream-101',  name: "FRANKY'S CREAM 101",  price: 58, stock: true,  main: '#f3e5df', shade: '#d9c4bb', brim: '#151515', patch: '#151515' },
+    { id: 'orange-303', name: "FRANKY'S ORANGE 303", price: 62, stock: false, main: '#faa21f', shade: '#c97f10', brim: '#151515', patch: '#151515' },
+    { id: 'steel-777',  name: "FRANKY'S STEEL 777",  price: 65, stock: true,  main: '#333333', shade: '#1f1f1f', brim: '#f3e5df', patch: '#faa21f' },
+    { id: 'pixel-001',  name: "FRANKY'S PIXEL 001",  price: 70, stock: true,  main: '#e5e7eb', shade: '#b8bbc2', brim: '#000000', patch: '#128e44' }
+  ];
+
+  // Pixel-art cap on a 32 x 16 grid (rows: [y, x1, x2) )
+  const CROWN = [[1,15,17],[2,10,22],[3,8,24],[4,7,25],[5,6,26],[6,5,27],[7,5,27],[8,5,27],[9,5,27],[10,5,27]];
+  const BRIM  = [[11,4,28],[12,4,30],[13,7,30]];
+
+  function capSVG(p) {
+    let out = '';
+    const all = CROWN.concat(BRIM);
+    // outline: each row expanded by 1px, painted black
+    all.forEach(([y, a, b]) => { out += `<rect x="${a-1}" y="${y-1}" width="${b-a+2}" height="3" fill="#000"/>`; });
+    CROWN.forEach(([y, a, b]) => { out += `<rect x="${a}" y="${y}" width="${b-a}" height="1" fill="${p.main}"/>`; });
+    // shaded right side of crown
+    CROWN.slice(3).forEach(([y, a, b]) => { out += `<rect x="${b-4}" y="${y}" width="4" height="1" fill="${p.shade}"/>`; });
+    // center seam
+    out += `<rect x="16" y="2" width="1" height="9" fill="${p.shade}"/>`;
+    // brim
+    BRIM.forEach(([y, a, b]) => { out += `<rect x="${a}" y="${y}" width="${b-a}" height="1" fill="${p.brim}"/>`; });
+    out += `<rect x="4" y="11" width="24" height="1" fill="${p.shade}" opacity=".55"/>`;
+    // logo patch (a tiny pixel cross)
+    out += `<rect x="12" y="7" width="1" height="3" fill="${p.patch}"/><rect x="11" y="8" width="3" height="1" fill="${p.patch}"/>`;
+    return `<svg viewBox="-1 0 34 16" role="img" aria-label="${p.name} cap">${out}</svg>`;
+  }
+
+  // ---------- state ----------
+  const cart = new Map();
+  let selected = PRODUCTS[0].id;
+
+  const $ = (id) => document.getElementById(id);
+  const euro = (n) => '€' + n;
+
+  // ---------- marquee ----------
+  (function () {
+    const msg = ['FREE SHIPPING OVER €75', 'NEW DROP: THE 665 SERIES', 'TRY EVERY CAP IN AR', 'AMSTERDAM / ONLINE ONLY'];
+    const one = msg.map(m => `<span>${m} *</span>`).join('');
+    $('marquee').innerHTML = one + one;
+    // duplicate halves so -50% loops seamlessly
+    const track = $('marquee');
+    track.innerHTML = one + one;
+    track.style.width = 'max-content';
+  })();
+
+  // ---------- grid ----------
+  function renderGrid() {
+    $('grid').innerHTML = PRODUCTS.map(p => {
+      const inCart = cart.has(p.id);
+      const buy = p.stock
+        ? `<button class="btn btn-buy" data-add="${p.id}" data-added="${inCart}">${inCart ? 'ADDED' : 'ADD TO CART'}</button>`
+        : `<button class="btn btn-out" disabled>OUT OF STOCK</button>`;
+      return `
+      <article class="card ${p.id === selected ? 'selected' : ''}" data-card="${p.id}">
+        <button class="card-img" data-pick="${p.id}" aria-label="View ${p.name} in the viewer">${capSVG(p)}</button>
+        <div class="meta">
+          <h2 class="title">${p.name}</h2>
+          <span class="price">${euro(p.price)}</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-ar="${p.id}">TRY IN <span class="pill">AR</span></button>
+          ${buy}
+        </div>
+      </article>`;
+    }).join('');
+    $('count').textContent = PRODUCTS.length + ' ITEMS';
+  }
+
+  function setHero(id) {
+    selected = id;
+    const p = PRODUCTS.find(x => x.id === id);
+    $('heroCap').innerHTML = capSVG(p);
+    $('heroLabel').textContent = p.name;
+    document.querySelectorAll('.card').forEach(c => {
+      const on = c.dataset.card === id;
+      c.classList.toggle('selected', on);
+    });
+  }
+
+  // ---------- cart ----------
+  function renderCart() {
+    const items = [...cart.keys()].map(id => PRODUCTS.find(p => p.id === id));
+    $('cartCount').textContent = items.length;
+    $('cartEmpty').hidden = items.length > 0;
+    $('cartTotal').hidden = items.length === 0;
+    $('cartList').innerHTML = items.map(p => `
+      <li><span>${p.name}<br>${euro(p.price)}</span><button class="remove" data-remove="${p.id}">REMOVE</button></li>`).join('');
+    $('cartSum').textContent = euro(items.reduce((s, p) => s + p.price, 0));
+  }
+
+  function closePanels() {
+    ['cartPanel', 'menuPanel'].forEach(id => $(id).hidden = true);
+    $('cartBtn').setAttribute('aria-expanded', 'false');
+    $('menuBtn').setAttribute('aria-expanded', 'false');
+  }
+  function togglePanel(panelId, btnId) {
+    const panel = $(panelId);
+    const willOpen = panel.hidden;
+    closePanels();
+    panel.hidden = !willOpen;
+    $(btnId).setAttribute('aria-expanded', String(willOpen));
+  }
+
+  // ---------- viewer toggles ----------
+  function setMode(mode) {
+    const is3d = mode === '3d', isAr = mode === 'ar';
+    $('t3d').setAttribute('aria-pressed', String(is3d));
+    $('tar').setAttribute('aria-pressed', String(isAr));
+    $('stage').classList.toggle('spinning', is3d);
+    $('arNote').hidden = !isAr;
+  }
+  $('t3d').addEventListener('click', () => setMode($('t3d').getAttribute('aria-pressed') === 'true' ? 'off' : '3d'));
+  $('tar').addEventListener('click', () => setMode($('tar').getAttribute('aria-pressed') === 'true' ? 'off' : 'ar'));
+
+  // ---------- events ----------
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button, a');
+    if (!t) { closePanels(); return; }
+
+    if (t.dataset.pick) { setHero(t.dataset.pick); if (innerWidth <= 860) $('hero').scrollIntoView(); return; }
+    if (t.dataset.ar) { setHero(t.dataset.ar); setMode('ar'); $('hero').scrollIntoView({ block: 'nearest' }); return; }
+    if (t.dataset.add) {
+      const id = t.dataset.add;
+      if (cart.has(id)) cart.delete(id); else cart.set(id, 1);
+      renderGrid(); renderCart(); return;
+    }
+    if (t.dataset.remove) { cart.delete(t.dataset.remove); renderGrid(); renderCart(); return; }
+
+    if (t.id === 'cartBtn') { togglePanel('cartPanel', 'cartBtn'); return; }
+    if (t.id === 'menuBtn') { togglePanel('menuPanel', 'menuBtn'); return; }
+    if (t.closest('.panel')) { closePanels(); return; }
+    if (t.id === 'subscribe' || t.id === 'shipping') return;
+    closePanels();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanels(); });
+
+  // init
+  renderGrid();
+  setHero(selected);
+  renderCart();
+</script>
+</body>
+</html>
